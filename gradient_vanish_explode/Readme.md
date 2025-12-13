@@ -9,7 +9,7 @@ The model is a 10-layer FCNN. Gradient norms were tracked for the weights of eve
 
 The configuration of the experiments are:
 
-1. Vanishing gradient: Sigmoid and tanh activation function with lr=$0.01$ to collapse the gradient towards 0.
+1. Vanishing gradient: Sigmoid and tanh activation function with lr=0.01 to collapse the gradient towards 0.
 2. Exploding gradient: Relu activation function with lr=$100.0$ to push the gradients to explode. 
 
 ### Results
