@@ -39,12 +39,12 @@ We train and evaluate on a custom **CIFAR-5** dataset containing the 5 animal cl
 | **Test Accuracy** | 86.94% | 83.42% | -3.52% |
 | **Parameters** | 11.23M | 2.74M | -75.5% |
 | **FLOPs / MACs** | 550.0M | 128.9M | -76.6% |
-| **Disk Size** | 42.8 MB | 10.5 MB | -75.5% |
-| **Batch Latency (GPU)** | 15.12 ms | 16.32 ms | +7.9% |
+| **Disk Size** | ~44.9 MB | ~11.0 MB | -75.5% |
+| **Batch Latency (GPU)** | 13.92 ms | 5.11 ms | -63.3% |
 
 ### Key Observations
 
 1. **Pruning as a Regularizer:** In the first iterative step (pruning ~13% of channels), the validation accuracy of the fine-tuned model actually **increased** from $86.94\%$ to **$87.42\%$**, proving that structured pruning can act as a regularizer by eliminating noisy, over-fitted channels.
 2. **Channel Sensitivity Bottlenecks:** The sensitivity analysis identified **`layer2.0.conv1`** as the absolute most sensitive layer (dropping accuracy by **$17.08\%$** under isolated 40% pruning), whereas all `conv2` layers (coupled with block skip connections) survived with **$0.00\%$** drop. SOTA policies must freeze or lightly prune early transition convs.
-3. **The GPU Latency Gotcha:** Although parameters and FLOPs decreased by **$75.5\%$**, the raw batch latency on GPU did not decrease (and actually increased slightly). This is a known structured pruning hardware artifact: GPUs run most efficiently when matrix/channel dimensions are aligned with **multiples of 32/64** (matching warp sizes and Tensor Cores). Pruning to non-standard shapes can lead to memory misalignment.
+3. **FLOPs-to-Speed Scaling (Quadratic Effect):** Structured channel pruning has a quadratic scaling effect on computational complexity and speed. By pruning $50\%$ of channels globally, both input and output dimensions of the conv matrices are halved, reducing overall FLOPs/MACs by **$76.6\%$** (nearly a $4\times$ reduction). Consequently, despite minor layer-wise GPU alignment overheads, the fully pruned model achieved a massive **$-63.3\%$ batch latency reduction** and a **$+172.6\%$ throughput increase** (2.7x speedup) on CUDA.
 4. **Compression Efficiency:** We successfully compressed the parameter footprint by **$4\times$** while maintaining **$96\%$** of the baseline accuracy.
